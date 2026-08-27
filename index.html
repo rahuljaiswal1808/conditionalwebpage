@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code of Conduct Acceptance</title>
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --ink: #1b2430;
+    --muted: #5c6b7a;
+    --brand: #2a5bd7;
+    --brand-dark: #1e46a8;
+    --line: #e3e8f0;
+    --ok: #1f9d55;
+    --ok-bg: #e8f7ee;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  header h1 {
+    font-size: 1.6rem;
+    margin: 0 0 .35rem;
+  }
+
+  header p.lead {
+    color: var(--muted);
+    margin: 0 0 1.75rem;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 18px rgba(27, 36, 48, .05);
+    margin-bottom: 1.25rem;
+  }
+
+  .step-label {
+    display: inline-block;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--brand);
+    background: #eef3ff;
+    padding: .25rem .6rem;
+    border-radius: 999px;
+    margin-bottom: .9rem;
+  }
+
+  h2 { font-size: 1.15rem; margin: 0 0 1rem; }
+
+  /* --- Hide the radio inputs; we drive everything from :checked --- */
+  .role-input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+  /* --- Role selection tiles --- */
+  .choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 480px) {
+    .choices { grid-template-columns: 1fr; }
+  }
+
+  .choice {
+    display: block;
+    cursor: pointer;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem;
+    transition: border-color .15s, background .15s, transform .05s;
+  }
+  .choice:hover { border-color: #c3d0ee; background: #fafbff; }
+  .choice .name { font-weight: 700; font-size: 1.05rem; }
+  .choice .desc { color: var(--muted); font-size: .9rem; }
+  .choice .tick {
+    float: right;
+    color: var(--brand);
+    font-weight: 700;
+    opacity: 0;
+  }
+
+  /* Highlight the selected tile */
+  #pick-fls:checked ~ .choices label[for="pick-fls"],
+  #pick-dist:checked ~ .choices label[for="pick-dist"] {
+    border-color: var(--brand);
+    background: #f2f6ff;
+  }
+  #pick-fls:checked ~ .choices label[for="pick-fls"] .tick,
+  #pick-dist:checked ~ .choices label[for="pick-dist"] .tick {
+    opacity: 1;
+  }
+
+  /* --- Conduct panels: hidden until a role is picked --- */
+  .conduct { display: none; }
+  #pick-fls:checked ~ #conduct-fls { display: block; }
+  #pick-dist:checked ~ #conduct-dist { display: block; }
+
+  /* Hint shown before any selection */
+  .hint {
+    color: var(--muted);
+    font-style: italic;
+    text-align: center;
+    padding: 1.25rem;
+  }
+  #pick-fls:checked ~ .hint,
+  #pick-dist:checked ~ .hint { display: none; }
+
+  .conduct h3 { margin: 0 0 .25rem; font-size: 1.1rem; }
+  .conduct .who { color: var(--muted); font-size: .9rem; margin: 0 0 1rem; }
+
+  .conduct ol { padding-left: 1.2rem; margin: 0 0 1.25rem; }
+  .conduct ol li { margin-bottom: .5rem; }
+  .conduct ol li strong { color: var(--ink); }
+
+  /* --- Accept row --- */
+  .accept {
+    display: flex;
+    align-items: flex-start;
+    gap: .6rem;
+    background: #f8fafd;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: .9rem 1rem;
+    margin-bottom: 1rem;
+  }
+  .accept input { margin-top: .35rem; width: 1.05rem; height: 1.05rem; }
+  .accept label { cursor: pointer; }
+
+  .btn {
+    appearance: none;
+    border: 0;
+    background: var(--brand);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: .8rem 1.4rem;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .btn:hover { background: var(--brand-dark); }
+
+  /* Disable the submit until the box is ticked — no JS, using :has()  */
+  .conduct:not(:has(.accept-box:checked)) .btn {
+    background: #b8c2d4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* Confirmation banner appears once accepted */
+  .confirm {
+    display: none;
+    align-items: center;
+    gap: .5rem;
+    background: var(--ok-bg);
+    color: var(--ok);
+    border: 1px solid #b7e6c8;
+    border-radius: 10px;
+    padding: .85rem 1rem;
+    font-weight: 600;
+    margin-top: 1rem;
+  }
+  .conduct:has(.accept-box:checked) .confirm { display: flex; }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: .8rem;
+    margin-top: 1rem;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Code of Conduct Acceptance</h1>
+      <p class="lead">Select your role to view and accept the Code of Conduct that applies to you.</p>
+    </header>
+
+    <!-- Single container so :checked can reach every sibling below -->
+    <div class="card">
+      <!-- Radios live at the top of the container -->
+      <input class="role-input" type="radio" name="role" id="pick-fls">
+      <input class="role-input" type="radio" name="role" id="pick-dist">
+
+      <span class="step-label">Step 1 &middot; Your role</span>
+      <h2>I am a&hellip;</h2>
+
+      <div class="choices">
+        <label class="choice" for="pick-fls">
+          <span class="tick">&#10003;</span>
+          <span class="name">FLS</span>
+          <div class="desc">Field Level Salesperson &mdash; direct employee representative.</div>
+        </label>
+        <label class="choice" for="pick-dist">
+          <span class="tick">&#10003;</span>
+          <span class="name">Distributor</span>
+          <div class="desc">Independent partner distributing on our behalf.</div>
+        </label>
+      </div>
+
+      <!-- Shown before a choice is made -->
+      <p class="hint">Pick an option above to continue.</p>
+
+      <!-- ============ FLS Code of Conduct ============ -->
+      <div class="conduct" id="conduct-fls">
+        <hr style="border:0;border-top:1px solid var(--line);margin:1.5rem 0;">
+        <span class="step-label">Step 2 &middot; Review &amp; accept</span>
+        <h3>FLS Code of Conduct</h3>
+        <p class="who">Applies to Field Level Salespersons</p>
+        <ol>
+          <li><strong>Represent honestly.</strong> Describe products and pricing accurately and never make claims that cannot be substantiated.</li>
+          <li><strong>Protect company information.</strong> Keep customer data, pricing, and internal materials confidential and use them only for authorized purposes.</li>
+          <li><strong>Follow the sales process.</strong> Log activity truthfully, honor territory assignments, and record every transaction through approved systems.</li>
+          <li><strong>Act with integrity.</strong> Do not offer or accept bribes, kickbacks, or any improper incentive to win business.</li>
+          <li><strong>Respect people.</strong> Treat customers and colleagues with courtesy and comply with all anti-harassment and equal-opportunity policies.</li>
+          <li><strong>Comply with the law.</strong> Observe all applicable local sales, tax, and consumer-protection regulations.</li>
+        </ol>
+
+        <div class="accept">
+          <input class="accept-box" type="checkbox" id="agree-fls">
+          <label for="agree-fls">I have read and agree to abide by the <strong>FLS Code of Conduct</strong>.</label>
+        </div>
+        <button class="btn" type="button">Accept &amp; Continue</button>
+
+        <div class="confirm"><span>&#10003;</span> Thank you &mdash; your acceptance of the FLS Code of Conduct has been recorded.</div>
+      </div>
+
+      <!-- ============ Distributor Code of Conduct ============ -->
+      <div class="conduct" id="conduct-dist">
+        <hr style="border:0;border-top:1px solid var(--line);margin:1.5rem 0;">
+        <span class="step-label">Step 2 &middot; Review &amp; accept</span>
+        <h3>Distributor Code of Conduct</h3>
+        <p class="who">Applies to Independent Distributors</p>
+        <ol>
+          <li><strong>Operate independently and lawfully.</strong> Run your business in full compliance with all licensing, tax, and import/export requirements in your market.</li>
+          <li><strong>Uphold the brand.</strong> Use only approved branding and marketing materials and never misrepresent your relationship with the company.</li>
+          <li><strong>Fair pricing &amp; territory.</strong> Respect agreed pricing frameworks and assigned territories; do not divert or grey-market product.</li>
+          <li><strong>Anti-corruption.</strong> Do not engage in bribery, facilitation payments, or dealings with sanctioned parties.</li>
+          <li><strong>Product integrity.</strong> Store, handle, and sell only genuine product within its validity and safety guidelines.</li>
+          <li><strong>Reporting &amp; audit.</strong> Maintain accurate records and cooperate with reasonable compliance audits and reporting requests.</li>
+        </ol>
+
+        <div class="accept">
+          <input class="accept-box" type="checkbox" id="agree-dist">
+          <label for="agree-dist">I have read and agree to abide by the <strong>Distributor Code of Conduct</strong>.</label>
+        </div>
+        <button class="btn" type="button">Accept &amp; Continue</button>
+
+        <div class="confirm"><span>&#10003;</span> Thank you &mdash; your acceptance of the Distributor Code of Conduct has been recorded.</div>
+      </div>
+    </div>
+
+    <footer>Your selection determines which Code of Conduct applies. This page works without JavaScript.</footer>
+  </div>
+</body>
+</html>
